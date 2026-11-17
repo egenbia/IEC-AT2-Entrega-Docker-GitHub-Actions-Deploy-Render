@@ -1,26 +1,63 @@
-# Funko Pop Manager (AT2 - LDW)
+# Funko Pop API: Entrega Contínua com Docker, GitHub Actions e Render
 
-SPA em React + TypeScript + Vite + Tailwind + shadcn/ui que consome a API REST da AT1
-(Node, Express, Sequelize, PostgreSQL) para gerenciar uma coleção de Funko Pops.
+API REST para gerenciar uma coleção de Funko Pops, desenvolvida em **Node.js, Express, TypeScript, Sequelize e PostgreSQL**. Este repositório faz parte da atividade **AT2 da disciplina Integração e Entrega Contínua (IEC)** e demonstra uma esteira completa de CI/CD: a cada push na branch `main`, o código é validado, a imagem Docker é construída e o deploy no Render é disparado por webhook.
 
-## Pré-requisitos
-- Node 20+ e pnpm
 
-## Backend
-```bash
-cd backend
-cp .env.example .env   # preencha DB_PASSWORD
-pnpm install
-pnpm dev               # http://localhost:3000/api-docs
+## Endpoints
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/api/health` | Status da aplicação (`{ "status": "ok", "uptime": 120 }`) |
+| GET | `/recursos` | Lista todos os Funko Pops |
+| GET | `/recursos/:id` | Busca um Funko Pop pelo id |
+| POST | `/recursos` | Cadastra um Funko Pop |
+| PUT | `/recursos/:id` | Atualiza um Funko Pop |
+| DELETE | `/recursos/:id` | Remove um Funko Pop |
+
+Exemplo de corpo para `POST /recursos`:
+
+```json
+{
+  "personagem": "Jon Snow",
+  "casa": "Stark",
+  "numeroColecao": 1,
+  "preco": 89.9,
+  "emEstoque": true
+}
 ```
 
-## Frontend
+
+## Como executar localmente
+
+### Pré-requisitos
+
+- Node.js 20+
+- pnpm 9 (`npm i -g pnpm@9`)
+- PostgreSQL em execução (local ou em contêiner)
+
+### Sem Docker
+
 ```bash
-cd frontend
-cp .env.example .env   # VITE_API_URL=http://localhost:3000
+cd backend
 pnpm install
+cp .env.example .env   # no Windows: copy .env.example .env
 pnpm dev
 ```
 
-## Funcionalidades
-Listagem, cadastro, edição e exclusão (CRUD) com loading, empty state e toasts.
+A API sobe em `http://localhost:3000`. Teste em `http://localhost:3000/api/health` e veja o Swagger em `http://localhost:3000/api-docs`.
+
+Para gerar o build de produção:
+
+```bash
+pnpm build
+node dist/server.js
+```
+
+### Com Docker
+
+```bash
+docker build -t funkopop-api ./backend
+docker run -p 3000:3000 --env-file backend/.env funkopop-api
+```
+
+Se o PostgreSQL estiver rodando na sua máquina, use `DB_HOST=host.docker.internal` no `.env`.

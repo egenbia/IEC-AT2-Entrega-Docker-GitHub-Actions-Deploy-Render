@@ -18,7 +18,11 @@ app.use(express.json());
 
 // Health check (usado pelo Render)
 app.get('/api/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+  res.status(200).json({
+    status: 'ok',
+    message: 'Funko Pop API v2 - deploy via GitHub Actions',
+    uptime: process.uptime(),
+  });
 });
 
 // Documentação Swagger
