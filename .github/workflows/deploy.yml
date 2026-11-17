@@ -1,0 +1,50 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    name: CI (tipos e build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: backend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: npx tsc --noEmit
+      - run: pnpm build
+
+  docker:
+    name: Build da imagem Docker
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t funkopop-api ./backend
+
+  deploy:
+    name: Deploy no Render
+    needs: [ci, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar Deploy Hook
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
+          echo "Status HTTP: $status"
+          if [ "$status" != "200" ] && [ "$status" != "201" ]; then
+            echo "Falha ao disparar o deploy"
+            exit 1
+          fi
