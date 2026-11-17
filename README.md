@@ -46,6 +46,12 @@ pnpm dev
 
 A API sobe em `http://localhost:3000`. Teste em `http://localhost:3000/api/health` e veja o Swagger em `http://localhost:3000/api-docs`.
 
+## API em produção
+
+- **URL base:** https://iec-at2-entrega-docker-github-actions.onrender.com
+- **Health check:** https://iec-at2-entrega-docker-github-actions.onrender.com/api/health
+- **Swagger:** https://iec-at2-entrega-docker-github-actions.onrender.com/api-docs
+
 Para gerar o build de produção:
 
 ```bash
